@@ -19,10 +19,18 @@ for (const user of users) {
     await processFolder(user)
 }
 
+function deepGetDirectories(distPath) {
+    return fs.readdirSync(distPath).filter(function (file) {
+        return fs.statSync(distPath + '/' + file).isDirectory();
+    }).reduce(function (all, subDir) {
+        return [...all, ...fs.readdirSync(distPath + '/' + subDir).map(e => subDir + '/' + e)]
+    }, []);
+}
+
 async function processFolder(user) {
-    let files = fs.readdirSync(path.join(garden, user), { recursive: true });
+    let files = deepGetDirectories(path.join(garden, user));
     for (const file of files) {
-        let title = file.replace(/\.[^/.]+$/, "")
+        let title = file.replace(/\.[^/.]+$/, "").split("/").pop()
         try { await processFile(path.join(garden, user, file), title, user) } catch (e) { console.log(e.message) }
     }
 }
