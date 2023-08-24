@@ -4,6 +4,7 @@ export async function load({ params }) {
     let node = await e.select({
         subnodes: e.select(e.Subnode, (subnode) => ({
             title: true,
+            user: true,
             body: true,
             links_to: true,
             filter: e.op(subnode.title, "=", params.title.toLowerCase())

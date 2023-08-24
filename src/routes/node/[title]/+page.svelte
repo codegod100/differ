@@ -9,10 +9,13 @@
 
 <h1>{data.title}</h1>
 {#each data.node.subnodes as subnode}
-  <div>{@html converter.makeHtml(convertLinks(subnode.body))}</div>
+  <div class="subnode">
+    <h2>User: {subnode.user}</h2>
+    <div>{@html converter.makeHtml(convertLinks(subnode.body))}</div>
+  </div>
 {/each}
 
-<div>Backlinks:</div>
+<h2>Backlinks:</h2>
 {#each data.node.backlinks as backlink}
   <div class="backlink">
     [[<a href={backlink.title}>{backlink.title}</a>]] links to
@@ -32,5 +35,8 @@
   }
   .backlink-2 {
     margin-left: 20px;
+  }
+  .subnode {
+    border-style: dashed;
   }
 </style>
