@@ -1,7 +1,10 @@
 import { exec } from "node:child_process"
 import fs from "fs"
-import { insertSubnode } from "./dbschema/queries.mjs"
+import { insertSubnode, updateSubnode } from "./dbschema/queries.mjs"
 import path from "node:path"
+import edgedb from "edgedb";
+
+const client = edgedb.createClient();
 // exec(`./diff.sh`, (err, stdout, stderr) => {
 //     console.log(stdout)
 //     let files = stdout.split("\n").filter((name) => name != "")
@@ -13,20 +16,27 @@ import path from "node:path"
 let garden = "garden"
 let users = fs.readdirSync(garden);
 for (const user of users) {
-    processFolder(user)
+    await processFolder(user)
 }
 
-function processFolder(user) {
-    let files = fs.readdirSync(path.join(garden, user));
+async function processFolder(user) {
+    let files = fs.readdirSync(path.join(garden, user), { recursive: true });
     for (const file of files) {
         let title = file.replace(/\.[^/.]+$/, "")
-        processFile(path.join(dir, file), title)
+        try { await processFile(path.join(garden, user, file), title, user) } catch (e) { console.log(e.message) }
     }
 }
-function processFile(file, title) {
+async function processFile(file, title, user) {
+    console.log({ file })
     let body = fs.readFileSync(file).toString()
     let links = parseLinks(body)
-    console.log({ user, body, title, links })
+    let subnode = { user, body, title, links }
+
+    try { await insertSubnode(client, subnode) } catch (e) {
+        await updateSubnode(client, subnode)
+        console.log("Skipping: ", e.message)
+    }
+    console.log(subnode)
 }
 
 function parseLinks(content) {

@@ -1,6 +1,6 @@
-insert Subnode{
-    user := <str>$user,
+update Subnode
+filter .user = <str>$user AND .title = <str>$title
+set {
     body := <str>$body,
-    title := <str>$title,
     links_to := array_unpack(<array<str>>$links)
 }

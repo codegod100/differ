@@ -7,8 +7,29 @@ export async function insertSubnode(client, args) {
 insert Subnode{
     user := <str>$user,
     body := <str>$body,
-    node := (select Node filter .title = <str>$title ),
-    links_to := (select Node filter .title in array_unpack(<array<str>>$links))
+    title := <str>$title,
+    links_to := array_unpack(<array<str>>$links)
+}`, args);
+
+}
+
+export async function updateSubnode(client, args) {
+  return client.querySingle(`\
+update Subnode
+filter .user = <str>$user AND .title = <str>$title
+set {
+    body := <str>$body,
+    links_to := array_unpack(<array<str>>$links)
+}`, args);
+
+}
+
+export async function backLinks(client, args) {
+  return client.query(`\
+with first := (select Subnode filter .title = <str>$title) 
+select first {
+    *, 
+    backlinks := (select Subnode{*} filter first.title in .links_to) 
 }`, args);
 
 }
