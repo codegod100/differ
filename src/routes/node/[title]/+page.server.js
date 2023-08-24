@@ -1,11 +1,19 @@
-import { backLinks } from "$lib/queries.mjs"
-import { json } from '@sveltejs/kit';
-import e from "$lib/edgedb"
-import * as edgedb from "edgedb";
+import { client, e } from "$lib/client"
 
-const client = edgedb.createClient();
 export async function load({ params }) {
-    let links = await backLinks(client, { title: params.title })
-    console.log(links, links.backlinks)
-    return { links }
+    let node = await e.select({
+        subnodes: e.select(e.Subnode, (subnode) => ({
+            title: true,
+            body: true,
+            links_to: true,
+            filter: e.op(subnode.title, "=", params.title.toLowerCase())
+        })),
+        backlinks: e.select(e.Subnode, (backlink) => ({
+            filter: e.op(params.title, "in", backlink.links_to),
+            title: true,
+            links_to: true
+        }))
+    }).run(client)
+    // console.log({ node })
+    return { node, title: params.title }
 }

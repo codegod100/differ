@@ -1,7 +1,36 @@
 <script>
   export let data;
   import { JsonView } from "@zerodevx/svelte-json-view";
-  let json = data.links;
+  import { convertLinks } from "$lib/convertLinks";
+  import showdown from "showdown";
+  const converter = new showdown.Converter();
+  converter.setFlavor("github");
 </script>
 
-<JsonView {json} />
+<h1>{data.title}</h1>
+{#each data.node.subnodes as subnode}
+  <div>{@html converter.makeHtml(convertLinks(subnode.body))}</div>
+{/each}
+
+<div>Backlinks:</div>
+{#each data.node.backlinks as backlink}
+  <div class="backlink">
+    [[<a href={backlink.title}>{backlink.title}</a>]] links to
+    <div class="backlink-2">
+      {@html backlink.links_to
+        .map((link) => `[[<a href="${link}">${link}</a>]]`)
+        .join(",")}
+    </div>
+  </div>
+{/each}
+
+<JsonView json={data.node} />
+
+<style>
+  .backlink {
+    margin-bottom: 3px;
+  }
+  .backlink-2 {
+    margin-left: 20px;
+  }
+</style>

@@ -28,9 +28,13 @@ function deepGetDirectories(distPath) {
 }
 
 async function processFolder(user) {
-    let files = deepGetDirectories(path.join(garden, user));
+    let files = fs.readdirSync(path.join(garden, user));
+    files = files.concat(deepGetDirectories(path.join(garden, user)))
+    // throw new Error(files)
     for (const file of files) {
-        let title = file.replace(/\.[^/.]+$/, "").split("/").pop()
+        let ext = file.split('.').pop();
+        if (ext !== "md") continue
+        let title = file.replace(/\.[^/.]+$/, "").split("/").pop().toLowerCase()
         try { await processFile(path.join(garden, user, file), title, user) } catch (e) { console.log(e.message) }
     }
 }
