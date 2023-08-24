@@ -6,4 +6,5 @@ module default {
         multi links_to: str;
         constraint exclusive on ((.user, .title));
     }
+
 }
