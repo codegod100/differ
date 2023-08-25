@@ -10,5 +10,5 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 /garden
 dbschema/edgeql-js
-
+differ-*
 src/lib/edgedb
