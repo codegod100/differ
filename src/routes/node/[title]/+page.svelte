@@ -27,7 +27,7 @@
   </div>
 {/each}
 
-<JsonView json={data.node} />
+<!-- <JsonView json={data.node} /> -->
 
 <style>
   .backlink {
