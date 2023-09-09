@@ -15,6 +15,5 @@ export async function load({ params }) {
             links_to: true
         }))
     }).run(client)
-    // console.log({ node })
     return { node, title: params.title }
 }
